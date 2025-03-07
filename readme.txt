@@ -1,0 +1,1 @@
+a simple bot that fetches spots from a binance api and send the data to a telegram channel
