@@ -2,6 +2,8 @@ using Binance.Spot;
 
 using Telegram.Bot;
 using TradingBot;
+using TradingBot.Helpers;
+using TradingTelegramService.services;
 using TradingTelegramService.Services;
 using TradingTelegramService.Worker;
 
@@ -14,9 +16,12 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHostedService<SpotTradingNotificationWorker>();
 builder.Services.AddSingleton<Market>();
-builder.Services.AddSingleton<BotServices>();
-builder.Services.AddSingleton<SpotingService>();
-builder.Services.AddScoped<Helpers>();
+builder.Services.AddSingleton<SpotTradingService>();
+builder.Services.AddSingleton<BotRepo>();
+builder.Services.AddSingleton<SpotingRepo>();
+
+
+
 builder.Services.AddSingleton<TelegramBotClient>(sp =>
 {
     var configuration = sp.GetRequiredService<IConfiguration>();
@@ -28,7 +33,7 @@ builder.Services.AddSingleton<TelegramBotClient>(sp =>
     return new TelegramBotClient(botToken);
 });
 
-builder.Services.AddSingleton<Helpers>();
+
 var app = builder.Build();
 
 

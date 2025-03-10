@@ -1,8 +1,8 @@
 ﻿
 
-using Binance.Spot;
-using Telegram.Bot;
-using TradingBot;
+using Telegram.Bot.Types;
+using TradingBot.Helpers;
+using TradingTelegramService.services;
 using TradingTelegramService.Services;
 
 namespace TradingTelegramService.Worker
@@ -10,31 +10,30 @@ namespace TradingTelegramService.Worker
     public class SpotTradingNotificationWorker : BackgroundService
     {
         private readonly ILogger<SpotTradingNotificationWorker> _logger;
-        private readonly BotServices _botservices;
+        private readonly SpotTradingService _spotTradingService;
 
-
-        public SpotTradingNotificationWorker(ILogger<SpotTradingNotificationWorker> logger,BotServices botServices)
+        public SpotTradingNotificationWorker(ILogger<SpotTradingNotificationWorker> logger, SpotTradingService spotTradingService)
         {
             _logger = logger;
-            _botservices = botServices;
-     }
+            _spotTradingService = spotTradingService;
+        }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            _logger.LogInformation("running...");
+            _logger.LogInformation("Spot Trading Notification Worker running...");
 
             while (!stoppingToken.IsCancellationRequested)
             {
                 try
                 {
-                    await _botservices.SendSpot();
+                    await _spotTradingService.CheckAndSendNotificationsAsync(stoppingToken);
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "error");
+                    _logger.LogError(ex, "Error in processing spot trading notifications");
                 }
 
-                await Task.Delay(TimeSpan.FromSeconds(15), stoppingToken); 
+                await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
             }
         }
     }
