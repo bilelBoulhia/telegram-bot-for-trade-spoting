@@ -9,8 +9,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Binance.Net" Version="10.18.0" />
     <PackageReference Include="Binance.Spot" Version="4.1.0" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
+    <PackageReference Include="Skender.Stock.Indicators" Version="2.6.1" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
     <PackageReference Include="Telegram.Bot" Version="22.4.4" />
   </ItemGroup>

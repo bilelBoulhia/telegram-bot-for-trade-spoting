@@ -10,9 +10,9 @@ namespace TradingTelegramService.Worker
     public class SpotTradingNotificationWorker : BackgroundService
     {
         private readonly ILogger<SpotTradingNotificationWorker> _logger;
-        private readonly SpotTradingService _spotTradingService;
+        private readonly SignalService _spotTradingService;
 
-        public SpotTradingNotificationWorker(ILogger<SpotTradingNotificationWorker> logger, SpotTradingService spotTradingService)
+        public SpotTradingNotificationWorker(ILogger<SpotTradingNotificationWorker> logger, SignalService spotTradingService)
         {
             _logger = logger;
             _spotTradingService = spotTradingService;
@@ -26,7 +26,11 @@ namespace TradingTelegramService.Worker
             {
                 try
                 {
-                    await _spotTradingService.CheckAndSendNotificationsAsync(stoppingToken);
+
+
+                    var symbol = await _spotTradingService.assignCoin();
+                    await _spotTradingService.PerfomSignalActionsync(symbol);
+              
                 }
                 catch (Exception ex)
                 {

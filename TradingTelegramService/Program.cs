@@ -1,5 +1,5 @@
 using Binance.Spot;
-
+using CryptoExchange.Net.Authentication;
 using Telegram.Bot;
 using TradingBot;
 using TradingBot.Helpers;
@@ -16,11 +16,14 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHostedService<SpotTradingNotificationWorker>();
 builder.Services.AddSingleton<Market>();
-builder.Services.AddSingleton<SpotTradingService>();
+builder.Services.AddSingleton<SignalService>();
 builder.Services.AddSingleton<BotRepo>();
 builder.Services.AddSingleton<SpotingRepo>();
-
-
+builder.Services.AddBinance(builder.Configuration.GetSection("Binance"));
+builder.Services.AddBinance(options => {
+ 
+    options.ApiCredentials = new ApiCredentials("APIKEY", "APISECRET");
+});
 
 builder.Services.AddSingleton<TelegramBotClient>(sp =>
 {

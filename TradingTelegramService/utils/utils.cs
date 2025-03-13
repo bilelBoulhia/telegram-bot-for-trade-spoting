@@ -3,31 +3,114 @@ using System.Security.Cryptography;
 using System.Text;
 using Telegram.Bot;
 using Telegram.Bot.Types;
+using System.Reflection;
+using TradingTelegramService.Enums;
 using TradingTelegramService.models;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using Skender.Stock.Indicators;
+using System.Text.Json;
 
 namespace TradingBot.Helpers
 {
 
-    public static class UserUtility
-    {
-        public static async Task<User> GetBotUserAsync(TelegramBotClient bot)
+
+
+    public static  class StockUtil{
+        public static RsiResult PerFormRSI(List<Quote> quote)
         {
-            return await bot.GetMe();
+          return quote.GetRsi(14).LastOrDefault();
         }
+        public static VwapResult PerFormVWMP(List<Quote> quote)
+        {
+            return quote.GetVwap().LastOrDefault();
+        }
+        public static MacdResult PerFormMACD(List<Quote> quote)
+        {
+            return quote.GetMacd().LastOrDefault();
+        }
+        public static BollingerBandsResult PerFormBollingBands(List<Quote> quote)
+        {
+            return quote.GetBollingerBands(20, 2).LastOrDefault();
+        }
+
+        public static AtrResult PerFormATR(List<Quote> quote)
+        {
+            return quote.GetAtr(14).LastOrDefault();
+        }
+        public static ObvResult PerFormObv(List<Quote> quote)
+        {
+            return quote.GetObv().LastOrDefault();
+        }
+
+        public static List<Quote> convertToQuotas(List<List<object>> obj)
+        {
+            List<Quote> quotes = new();
+
+            foreach (var quota in obj)
+            {
+                quotes.Add(new Quote
+                {
+                    Date = DateTimeOffset.FromUnixTimeMilliseconds(((JsonElement)quota[0]).GetInt64()).UtcDateTime,
+                    Open = Convert.ToDecimal(((JsonElement)quota[1]).GetString()),
+                    High = Convert.ToDecimal(((JsonElement)quota[2]).GetString()),
+                    Low = Convert.ToDecimal(((JsonElement)quota[3]).GetString()),
+                    Close = Convert.ToDecimal(((JsonElement)quota[4]).GetString()),
+                    Volume = Convert.ToDecimal(((JsonElement)quota[5]).GetString())
+                });
+            }
+
+            return quotes;
+
+        }
+
+        public static bool PerformTechnicalAnalasys(QuotaResults quotaResults)
+        {
+            decimal atrThreshold = 0.5m;
+            decimal rsiOverbought = 70m;
+            decimal bandProximityPct = 0.01m;
+
+            if ((decimal)quotaResults.rsiResult.Rsi < rsiOverbought &&
+                 quotaResults.LatestQuote.Close < (decimal)quotaResults.vwapResult.Vwap &&
+                (decimal)quotaResults.macdResult.Macd < (decimal)quotaResults.macdResult.Signal &&
+                 quotaResults.LatestQuote.Close >= (decimal)quotaResults.bandsResult.UpperBand * (1 - bandProximityPct) &&
+                (decimal)quotaResults.obvResult.Obv < 0)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+
+
+
     }
 
+
+
+
+    public static class ClassUtil
+    {
+     public static List<string> GetCoins()
+        {
+            return typeof(CryptoConstants).GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy)
+                .Select(F => F.GetValue(null)?.ToString())
+                .ToList();
+        }
+
+    }
+  
 
     public static class MessageUtility
     {
         public static string FormatSpotTradeSignal(SpotModel sp)
         {
-            return $"🟢 Trading Signal 🟢\n" +
+            return $"🟢 Signal 🟢\n" +
                    $"Coin: {sp.Symbol}\n" +
-                   $"price: {PriceUtility.turnicateNumber(sp.entryPrice)}\n" +
-                   $"🎯 Target 1 (1%): {PriceUtility.turnicateNumber(sp.target1)}\n" +
-                   $"🎯 Target 2 (2%): {PriceUtility.turnicateNumber(sp.target2)}\n" +
-                   $"🔻 Stop Loss: {PriceUtility.turnicateNumber(sp.stopLoss)}";
+                   $"prix: {PriceUtility.turnicateNumber(sp.entryPrice)}\n" +
+                   $"🎯 Tp1 (1%): {PriceUtility.turnicateNumber(sp.target1)}\n" +
+                   $"🎯 Tp2 (2%): {PriceUtility.turnicateNumber(sp.target2)}\n" +
+                   $"🔻 SP : {PriceUtility.turnicateNumber(sp.stopLoss)}";
         }
         public static string FromatReplySpot(int index,SpotModel spotModel)
         {
@@ -39,6 +122,9 @@ namespace TradingBot.Helpers
                     return $"{spotModel.Symbol} Tp2 ✅ :  {PriceUtility.turnicateNumber(spotModel.target2)} ";
                 case 3:
                     return $"{spotModel.Symbol} stopLoss ❌:  {PriceUtility.turnicateNumber(spotModel.stopLoss)} ";
+
+                case 4:
+                    return $"{spotModel.Symbol} deal secured ✅ :  {PriceUtility.turnicateNumber(spotModel.stopLoss)} ";
                 case 0:
                     return null;
                 default:
