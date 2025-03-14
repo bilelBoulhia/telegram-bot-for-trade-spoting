@@ -6,9 +6,11 @@ using Telegram.Bot.Types;
 using System.Reflection;
 using TradingTelegramService.Enums;
 using TradingTelegramService.models;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+
 using Skender.Stock.Indicators;
 using System.Text.Json;
+using System.Drawing;
+using TradingTelegramService.Services;
 
 namespace TradingBot.Helpers
 {
@@ -91,12 +93,20 @@ namespace TradingBot.Helpers
 
     public static class ClassUtil
     {
-     public static List<string> GetCoins()
+     public static List<string> GetDataFromClass()
         {
             return typeof(CryptoConstants).GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy)
                 .Select(F => F.GetValue(null)?.ToString())
                 .ToList();
         }
+
+
+  
+        public static void clearList<T>(List<T> l) 
+        {
+            l.Clear();
+        }
+
 
     }
   
@@ -110,21 +120,20 @@ namespace TradingBot.Helpers
                    $"prix: {PriceUtility.turnicateNumber(sp.entryPrice)}\n" +
                    $"🎯 Tp1 (1%): {PriceUtility.turnicateNumber(sp.target1)}\n" +
                    $"🎯 Tp2 (2%): {PriceUtility.turnicateNumber(sp.target2)}\n" +
-                   $"🔻 SP : {PriceUtility.turnicateNumber(sp.stopLoss)}";
+                   $"🔻 SP : {PriceUtility.turnicateNumber(sp.stopLoss)}" +
+                   $"🔻 temp : {PriceUtility.turnicateNumber(sp.timeStamp)}";
+
         }
-        public static string FromatReplySpot(int index,SpotModel spotModel)
+        public static string FromatReplySpot(int index,SpotModel spotModel,TimeSpan duration)
         {
             switch(index)
             {
                 case 1:
-                    return $"{spotModel.Symbol} Tp1 ✅ :  {PriceUtility.turnicateNumber(spotModel.target1)} ";
+                    return $"{spotModel.Symbol} Tp1 ✅ :  {PriceUtility.turnicateNumber(spotModel.target1)}, duration:{duration.TotalMinutes} ";
                 case 2:
-                    return $"{spotModel.Symbol} Tp2 ✅ :  {PriceUtility.turnicateNumber(spotModel.target2)} ";
+                    return $"{spotModel.Symbol} Tp2 ✅ :  {PriceUtility.turnicateNumber(spotModel.target2)}, duration:{duration.TotalMinutes} ";
                 case 3:
-                    return $"{spotModel.Symbol} stopLoss ❌:  {PriceUtility.turnicateNumber(spotModel.stopLoss)} ";
-
-                case 4:
-                    return $"{spotModel.Symbol} deal secured ✅ :  {PriceUtility.turnicateNumber(spotModel.stopLoss)} ";
+                    return $"{spotModel.Symbol} stopLoss ❌:  {PriceUtility.turnicateNumber(spotModel.stopLoss)} , duration:{duration.TotalMinutes}";
                 case 0:
                     return null;
                 default:
@@ -152,6 +161,7 @@ namespace TradingBot.Helpers
 
             switch (spot.entryPrice)
             {
+
                 case var p when p >= spot.target1 && p < spot.target2:
                     return 1;
                 case var p when p >= spot.target2:

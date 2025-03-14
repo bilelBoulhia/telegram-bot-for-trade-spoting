@@ -1,5 +1,5 @@
-﻿using System.Security.Cryptography;
-using Telegram.Bot.Types;
+﻿using CryptoExchange.Net.CommonObjects;
+using System;
 using TradingBot.Helpers;
 using TradingTelegramService.models;
 using TradingTelegramService.Services;
@@ -7,68 +7,119 @@ using TradingTelegramService.Services;
 namespace TradingTelegramService.services
 {
     public class SignalService
+{
+    private readonly BotRepo _botservices;
+    private readonly SpotingRepo _spotingRepo;
+    private List<string> coins = ClassUtil.GetDataFromClass();
+    private Dictionary<string, List<List<object>>> _cachedCoinData = new(); 
+
+    public SignalService(BotRepo botServices, SpotingRepo spotingRepo)
     {
-        private readonly BotRepo _botservices;
-        private readonly SpotingRepo _spotingRepo;
-        private decimal _latestprice;
-        private Message LatestBotMessage;
+        _botservices = botServices;
+        _spotingRepo = spotingRepo;
+    }
 
+    public async Task<List<coinData>> fetchCoinData()
+    {
+        List<coinData> coindata = new();
 
-        public SignalService(BotRepo botServices, SpotingRepo spotingRepo)
+        foreach (var c in coins)
         {
-            _botservices = botServices;
-            _spotingRepo = spotingRepo;
+          
+            if (_cachedCoinData.TryGetValue(c, out var oldData))
+            {
+                var newData = await _spotingRepo.FetchCandleStickData(c);
+
+               
+                if (newData.Count > 0 && oldData.Count > 0 )
+                {
+                 
+                    continue; 
+                }
+
+                _cachedCoinData[c] = newData; 
+                coindata.Add(new coinData { data = newData, symbol = c });
+            }
+            else
+            {
+                
+                var newData = await _spotingRepo.FetchCandleStickData(c);
+                _cachedCoinData[c] = newData;
+
+                coindata.Add(new coinData { data = newData, symbol = c });
+
+        
+            }
         }
 
-
-        public async Task<string> assignCoin()
+        return coindata;
+    }
+        public List<string> performAnalays(List<coinData> coindata)
         {
-            List<string> coins = ClassUtil.GetCoins();
-            foreach(var coin in coins)
+            List<string> coinsReadyTobeSignaled = new();
+            foreach (var coin in coindata)
             {
-             var data = await  _spotingRepo.FetchCandleStickData(coin);
-             var quotas = StockUtil.convertToQuotas(data);
+                var quotas = StockUtil.convertToQuotas(coin.data);
                 QuotaResults qr = new QuotaResults()
                 {
                     rsiResult = StockUtil.PerFormRSI(quotas),
+                    LatestQuote = quotas.LastOrDefault(),
                     atrResult = StockUtil.PerFormATR(quotas),
                     bandsResult = StockUtil.PerFormBollingBands(quotas),
-                    LatestQuote = quotas.LastOrDefault(),
                     macdResult = StockUtil.PerFormMACD(quotas),
                     obvResult = StockUtil.PerFormObv(quotas),
                     vwapResult = StockUtil.PerFormVWMP(quotas),
                 };
                 if (StockUtil.PerformTechnicalAnalasys(qr))
                 {
-                    return coin;
-                    break;
-                }  
-                
-            }
-            return null;
-        }
-
-        public async Task PerfomSignalActionsync(string symbol)
-        {
-            var spot = await _spotingRepo.FetchSpotings(symbol);
-            if (_latestprice == 0)
-            {
-                _latestprice = spot.entryPrice;
-                var spotMessage = MessageUtility.FormatSpotTradeSignal(spot);
-                LatestBotMessage = await _botservices.SendMessage(spot, spotMessage);
-            }
-            if (PriceUtility.HasPriceChanged(_latestprice, spot.entryPrice))
-            {
-                int index = PriceUtility.CheckUpdatedPrice(spot);
-
-                if (index != 0)
-                {
-                    string reply = MessageUtility.FromatReplySpot(index, spot);
-                    await _botservices.ReplyToMessage(LatestBotMessage, reply);
+                    coinsReadyTobeSignaled.Add(coin.symbol);
                 }
+
+
+
             }
+            return coinsReadyTobeSignaled;
         }
 
+        public async Task<List<MoniteredCoinsModel>> FetchSpotOfSelectedCoins(List<string> SelectedCoins)
+        {
+            List<MoniteredCoinsModel> monitoredCoins = new();
+            foreach (var coin in SelectedCoins)
+            {
+                monitoredCoins.Add(new MoniteredCoinsModel()
+                {
+                    coinSP = await _spotingRepo.FetchSpotings(coin),
+                    createdAt = DateTime.UtcNow
+                }); 
+            }
+
+            return monitoredCoins;
+
+        }
+
+        public async Task SendSelectedCoins(List<MoniteredCoinsModel> SelectedCoins)
+        {
+           
+          foreach(var coin in SelectedCoins)
+            {
+                if(coin.attachedMessage == null)
+                {
+                    var spotMessage = MessageUtility.FormatSpotTradeSignal(coin.coinSP);
+                    coin.attachedMessage = await _botservices.SendMessage(coin.coinSP, spotMessage);
+                }
+                else
+                {
+                    var duration = DateTime.UtcNow - coin.coinSP.timeStamp;
+                    string reply = MessageUtility.FromatReplySpot(PriceUtility.CheckUpdatedPrice(coin.coinSP), coin.coinSP, duration);
+                    await _botservices.ReplyToMessage(coin.attachedMessage, reply);
+
+                }
+               
+            }
+
+        }
 
     }
+
+
 }

@@ -8,7 +8,7 @@
         public const string Solana = "SOLUSDT";
         public const string Cardano = "ADAUSDT";
         public const string TRON = "TRXUSDT";
-        public const string Pi = "PIUSDT";
+
         public const string WrappedBitcoin = "WBTCUSDT";
         public const string BitcoinCash = "BCHUSDT";
         public const string Chainlink = "LINKUSDT";
@@ -19,33 +19,31 @@
         public const string Toncoin = "TONUSDT";
         public const string Mantra = "OMUSDT";
         public const string Polkadot = "DOTUSDT";
-        public const string BitgetToken = "BGBUSDT";
         public const string EthereumClassic = "ETCUSDT";
         public const string HederaHashgraph = "HBARUSDT";
         public const string Aptos = "APTUSDT";
-        public const string Uniswap = "UNIUSDTUSDT";
+       
         public const string NEARProtocol = "NEARUSDT";
         public const string Stacks = "STXUSDT";
         public const string InternetComputer = "ICPUSDT";
         public const string Aave = "AAVEUSDT";
         public const string Arbitrum = "ARBUSDT";
-        public const string Mantle = "MNTUSDT";
+       
         public const string Monero = "XMRUSDT";
-        public const string Cronos = "CROUSDT";
         public const string Bittensor = "TAOUSDT";
         public const string VeChain = "VETUSDT";
         public const string Celestia = "TIAUSDT";
         public const string POL = "POLUSDT"; 
         public const string Filecoin = "FILUSDT";
         public const string Algorand = "ALGOUSDT";
-        public const string CoreDAO = "COREUSDT";
+   
         public const string Render = "RENDERUSDT";
         public const string Cosmos = "ATOMUSDT";
         public const string Optimism = "OPUSDT";
         public const string Jupiter = "JUPUSDT";
         public const string Flow = "FLOWUSDT";
         public const string Sonic = "SUSDT";
-        public const string BitcoinSV = "BSVUSDT";
+
         public const string Quant = "QNTUSDT";
         public const string Bittorrent = "BTTUSDT";
         public const string Movement = "MOVEUSDT";
@@ -58,9 +56,9 @@
         public const string Injective = "INJUSDT";
         public const string Tezos = "XTZUSDT";
         public const string Worldcoin = "WLDUSDT";
-        public const string Flare = "FLRUSDT";
+  
         public const string Eos = "EOSUSDT";
-        public const string EOSForce = "EOSCUSDT";
+     
         public const string TheGraph = "GRTUSDT";
         public const string Sei = "SEIUSDT";
         public const string MinaProtocol = "MINAUSDT";
@@ -77,7 +75,7 @@
         public const string EthereumNameService = "ENSUSDT";
         public const string Golem = "GLMUSDT";
         public const string Moonbeam = "GLMRUSDT";
-        public const string XdcNetwork = "XDCUSDT";
+ 
         public const string CurveDAOToken = "CRVUSDT";
         public const string PythNetwork = "PYTHUSDT";
         public const string MultiversX = "EGLDUSDT";
@@ -85,10 +83,9 @@
         public const string Raydium = "RAYUSDT";
         public const string Iotex = "IOTXUSDT";
         public const string EnjinCoin = "ENJUSDT";
-        public const string Onyxcoin = "XCNUSDT";
+
         public const string Celo = "CELOUSDT";
-        public const string APENFT = "NFTUSDT";
-        public const string AerodromeFinance = "AEROUSDT";
+
         public const string Siacoin = "SCUSDT";
         public const string Polygon = "MATICUSDT";
         public const string THORChain = "RUNEUSDT";
@@ -102,18 +99,17 @@
         public const string SafePal = "SFPUSDT";
         public const string Holo = "HOTUSDT";
         public const string TrustWalletToken = "TWTUSDT";
-        public const string AkashNetwork = "AKTUSDT";
+
         public const string BasicAttentionToken = "BATUSDT";
         public const string Aragon = "ANTUSDT";
         public const string Nem = "XEMUSDT";
-        public const string Casper = "CSPRUSDT";
-        public const string Telcoin = "TELUSDT";
-        public const string Grass = "GRASSUSDT";
+
+
         public const string Decred = "DCRUSDT";
         public const string Flux = "FLUXUSDT";
         public const string Biconomy = "BICOUSDT";
         public const string Reserve = "RSRUSDT";
-        public const string AIOZNetwork = "AIOZUSDT";
+     
         public const string Beam = "BEAMUSDT";
         public const string Waves = "WAVESUSDT";
         public const string Ontology = "ONTUSDT";
@@ -124,9 +120,9 @@
         public const string Wormhole = "WUSDT";
         public const string Lisk = "LSKUSDT";
         public const string zkSync = "ZKUSDT";
-        public const string Aethir = "ATHUSDT";
+       
         public const string Kusama = "KSMUSDT";
-        public const string BabyDoge = "BABYDOGEUSDT";
+
         public const string Zilliqa = "ZILUSDT";
         public const string OasisNetwork = "ROSEUSDT";
         public const string SuperVerse = "SUPERUSDT";
@@ -135,9 +131,9 @@
         public const string Kadena = "KDAUSDT";
         public const string Icon = "ICXUSDT";
         public const string MaskNetwork = "MASKUSDT";
-        public const string Safe = "SAFEUSDT";
+     
         public const string WAX = "WAXPUSDT";
-        public const string AlephZero = "AZEROUSDT";
+
         public const string VeThorToken = "VTHOUSDT";
         public const string Livepeer = "LPTUSDT";
         public const string Protocol0x = "ZRXUSDT";
@@ -147,3 +143,4 @@
     }
 
 }
+

@@ -4,9 +4,8 @@ using System.Text.Json;
 using TradingTelegramService.Interfaces;
 using TradingTelegramService.models;
 using TradingBot.Helpers;
-using Binance.Spot.Models;
-using System.Collections.Generic;
-using Skender.Stock.Indicators;
+
+
 
 namespace TradingTelegramService.Services
 {
@@ -38,7 +37,7 @@ namespace TradingTelegramService.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+
                 return null;
             }
          
@@ -66,7 +65,8 @@ namespace TradingTelegramService.Services
                     target1 = PriceUtility.turnicateNumber(tunicatedentryPrice * 1.01m),
                     target2 = PriceUtility.turnicateNumber(tunicatedentryPrice * 1.02m),
                     stopLoss = PriceUtility.turnicateNumber(tunicatedentryPrice * 0.98m),
-                    timeStamp = DateTime.Now
+                    timeStamp = DateTime.UtcNow
+               
                 };
 
               
