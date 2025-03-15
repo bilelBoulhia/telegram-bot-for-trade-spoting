@@ -65,8 +65,8 @@ namespace TradingTelegramService.Services
                     target1 = tunicatedentryPrice * 1.01m,
                     target2 = tunicatedentryPrice * 1.02m,
                     stopLoss = tunicatedentryPrice * 0.98m,
-                    timeStamp = DateTime.UtcNow
-               
+                    timeStamp = DateTime.UtcNow + TimeSpan.FromHours(1)
+
                 };
 
               

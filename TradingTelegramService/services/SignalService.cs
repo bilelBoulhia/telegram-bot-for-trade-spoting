@@ -72,7 +72,7 @@ namespace TradingTelegramService.services
                 monitoredCoins.Add(new MoniteredCoinsModel()
                 {
                     coinSP = await _spotingRepo.FetchSpotings(coin),
-                    createdAt = DateTime.UtcNow
+                    createdAt = DateTime.UtcNow + TimeSpan.FromHours(1)
                 }); 
             }
 
@@ -95,7 +95,7 @@ namespace TradingTelegramService.services
                 }
                 else
                 {
-                    var duration = DateTime.UtcNow - coin.coinSP.timeStamp;
+                    var duration = (DateTime.UtcNow + TimeSpan.FromHours(1)) - coin.coinSP.timeStamp;
                  
                     string reply = MessageUtility.FromatReplySpot(PriceUtility.CheckUpdatedPrice(coin.coinSP), coin.coinSP, duration);
                     if(reply != null)

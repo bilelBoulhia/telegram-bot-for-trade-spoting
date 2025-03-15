@@ -63,8 +63,8 @@ namespace TradingTelegramService.Worker
 
             while (moniteredCoins == null && !stoppingToken.IsCancellationRequested)
             {
-                _logger.LogInformation("Waiting for monitored coins to be initialized...");
-                await Task.Delay(TimeSpan.FromSeconds(1), stoppingToken);
+
+                await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
             }
 
             while (!stoppingToken.IsCancellationRequested)
