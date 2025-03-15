@@ -1,16 +1,9 @@
-﻿using Microsoft.OpenApi.Any;
-using System.Security.Cryptography;
-using System.Text;
-using Telegram.Bot;
-using Telegram.Bot.Types;
-using System.Reflection;
-using TradingTelegramService.Enums;
+﻿using System.Reflection;
+using TradingTelegramService.Constants;
 using TradingTelegramService.models;
-
 using Skender.Stock.Indicators;
 using System.Text.Json;
-using System.Drawing;
-using TradingTelegramService.Services;
+
 
 namespace TradingBot.Helpers
 {
@@ -141,15 +134,7 @@ namespace TradingBot.Helpers
 
     }
 
-    /*
-     return $"🟢 Signal 🟢\n" +
-                   $"Coin: {sp.Symbol}\n" +
-                   $"prix: {PriceUtility.turnicateNumber(sp.entryPrice)}\n" +
-                   $"🎯 Tp1 (1%): {PriceUtility.turnicateNumber(sp.target1)}\n" +
-                   $"🎯 Tp2 (2%): {PriceUtility.turnicateNumber(sp.target2)}\n" +
-                   $"🔻 SP : {PriceUtility.turnicateNumber(sp.stopLoss)}" +
-                   $"🔻 temp : {sp.timeStamp}";
-     */
+
 
     public static class MessageUtility
     {
@@ -184,24 +169,6 @@ namespace TradingBot.Helpers
             
         }
     }
-    /*
-      switch(index)
-            {
-                case 1:
-                    return $"{spotModel.Symbol} Tp1 ✅ :  {PriceUtility.turnicateNumber(spotModel.target1)}, duration:{duration.TotalMinutes} ";
-                case 2:
-                    return $"{spotModel.Symbol} Tp2 ✅ :  {PriceUtility.turnicateNumber(spotModel.target2)}, duration:{duration.TotalMinutes} ";
-                case 3:
-                    return $"{spotModel.Symbol} stopLoss ❌:  {PriceUtility.turnicateNumber(spotModel.stopLoss)} , duration:{duration.TotalMinutes}";
-                case 0:
-                    return null;
-                default:
-                    return null;
-
-
-            }
-     
-     */
 
     public static class PriceUtility
     {

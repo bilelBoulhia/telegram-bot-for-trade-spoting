@@ -1,9 +1,5 @@
-﻿using System.Text.Json;
-using Telegram.Bot.Types;
-using TradingBot.Helpers;
-using TradingTelegramService.models;
+﻿using TradingTelegramService.models;
 using TradingTelegramService.services;
-using TradingTelegramService.Services;
 
 namespace TradingTelegramService.Worker
 {
@@ -58,7 +54,7 @@ namespace TradingTelegramService.Worker
                     _logger.LogError(ex, "Error in main task");
                 }
 
-                await Task.Delay(TimeSpan.FromMinutes(15), stoppingToken);
+                await Task.Delay(TimeSpan.FromHours(2), stoppingToken);
             }
         }
 
@@ -87,7 +83,7 @@ namespace TradingTelegramService.Worker
                         _logger.LogInformation("No coins are being monitored.");
                     }
 
-                    await Task.Delay(TimeSpan.FromSeconds(2), stoppingToken);
+                    await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);
                 }
                 catch (Exception ex)
                 {

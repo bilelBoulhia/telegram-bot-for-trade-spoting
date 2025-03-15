@@ -82,17 +82,3 @@ namespace TradingTelegramService.Services
     }
 }
 
-/*
- var tunicatedentryPrice = PriceUtility.turnicateNumber(priceData.Price);
-                return new SpotModel()
-                {
-                    Symbol = symbol,
-                    entryPrice = PriceUtility.turnicateNumber(priceData.Price),
-                    target1 = PriceUtility.turnicateNumber(tunicatedentryPrice * 1.01m),
-                    target2 = PriceUtility.turnicateNumber(tunicatedentryPrice * 1.02m),
-                    stopLoss = PriceUtility.turnicateNumber(tunicatedentryPrice * 0.98m),
-                    timeStamp = DateTime.UtcNow
-               
-                };
- 
- */
