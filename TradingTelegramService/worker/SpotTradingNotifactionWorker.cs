@@ -37,26 +37,26 @@ namespace TradingTelegramService.Worker
                     if (treatedCoins.Count == 0)
                     {
                         _logger.LogInformation("No coins have enough liquidity.");
+                        await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken); 
+                        continue; 
                     }
-                    else
+
+                    if (moniteredCoins != null)
                     {
-                        if (moniteredCoins != null)
-                        {
-                            moniteredCoins.Clear();
-                        }
-             
-                        moniteredCoins = await _spotTradingService.FetchSpotOfSelectedCoins(treatedCoins);
-                        
+                        moniteredCoins.Clear();
                     }
+
+                    moniteredCoins = await _spotTradingService.FetchSpotOfSelectedCoins(treatedCoins);
                 }
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "Error in main task");
                 }
 
-                await Task.Delay(TimeSpan.FromHours(2), stoppingToken);
+                await Task.Delay(TimeSpan.FromHours(2), stoppingToken); 
             }
         }
+
 
         private async Task RunSendingTask(CancellationToken stoppingToken)
         {
