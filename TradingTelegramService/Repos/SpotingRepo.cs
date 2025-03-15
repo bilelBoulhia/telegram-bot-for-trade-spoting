@@ -57,14 +57,14 @@ namespace TradingTelegramService.Services
                 
                 string json = await response.Content.ReadAsStringAsync();
                 var priceData = JsonSerializer.Deserialize<BinanceResponse>(json);
-                var tunicatedentryPrice = PriceUtility.turnicateNumber(priceData.Price);
+                var tunicatedentryPrice = Convert.ToDecimal(priceData.Price);
                 return new SpotModel()
                 {
                     Symbol = symbol,
-                    entryPrice = PriceUtility.turnicateNumber(priceData.Price),
-                    target1 = PriceUtility.turnicateNumber(tunicatedentryPrice * 1.01m),
-                    target2 = PriceUtility.turnicateNumber(tunicatedentryPrice * 1.02m),
-                    stopLoss = PriceUtility.turnicateNumber(tunicatedentryPrice * 0.98m),
+                    entryPrice = tunicatedentryPrice,
+                    target1 = tunicatedentryPrice * 1.01m,
+                    target2 = tunicatedentryPrice * 1.02m,
+                    stopLoss = tunicatedentryPrice * 0.98m,
                     timeStamp = DateTime.UtcNow
                
                 };
@@ -81,3 +81,18 @@ namespace TradingTelegramService.Services
         
     }
 }
+
+/*
+ var tunicatedentryPrice = PriceUtility.turnicateNumber(priceData.Price);
+                return new SpotModel()
+                {
+                    Symbol = symbol,
+                    entryPrice = PriceUtility.turnicateNumber(priceData.Price),
+                    target1 = PriceUtility.turnicateNumber(tunicatedentryPrice * 1.01m),
+                    target2 = PriceUtility.turnicateNumber(tunicatedentryPrice * 1.02m),
+                    stopLoss = PriceUtility.turnicateNumber(tunicatedentryPrice * 0.98m),
+                    timeStamp = DateTime.UtcNow
+               
+                };
+ 
+ */

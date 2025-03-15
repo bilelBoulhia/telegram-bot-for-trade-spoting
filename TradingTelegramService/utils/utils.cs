@@ -100,8 +100,39 @@ namespace TradingBot.Helpers
                 .ToList();
         }
 
+        public static bool AreListsDifferent(List<List<object>> oldCandle, List<List<object>> newCandle)
+        {
 
-  
+
+
+            try
+            {
+               
+                decimal oldOpen = Convert.ToDecimal(((JsonElement)oldCandle[oldCandle.Count-1][1]).GetString());
+                decimal oldHigh = Convert.ToDecimal(((JsonElement)oldCandle[oldCandle.Count - 1][2]).GetString());
+                decimal oldLow = Convert.ToDecimal(((JsonElement)oldCandle[oldCandle.Count - 1][3]).GetString());
+                decimal oldClose = Convert.ToDecimal(((JsonElement)oldCandle[oldCandle.Count - 1][4]).GetString());
+                decimal oldVolume = Convert.ToDecimal(((JsonElement)oldCandle[oldCandle.Count - 1][5]).GetString());
+
+                decimal newOpen = Convert.ToDecimal(((JsonElement)oldCandle[oldCandle.Count - 1][1]).GetString());
+                decimal newHigh = Convert.ToDecimal(((JsonElement)oldCandle[oldCandle.Count - 1][2]).GetString());
+                decimal newLow = Convert.ToDecimal(((JsonElement)oldCandle[oldCandle.Count - 1][3]).GetString());
+                decimal newClose = Convert.ToDecimal(((JsonElement)oldCandle[oldCandle.Count - 1][4]).GetString());
+                decimal newVolume = Convert.ToDecimal(((JsonElement)oldCandle[oldCandle.Count - 1][5]).GetString());
+
+                return oldOpen != newOpen ||
+                       oldHigh != newHigh ||
+                       oldLow != newLow ||
+                       oldClose != newClose ||
+                       oldVolume != newVolume;
+            }
+            catch
+            {
+                return true; 
+            }
+        
+        }
+
         public static void clearList<T>(List<T> l) 
         {
             l.Clear();
@@ -109,7 +140,16 @@ namespace TradingBot.Helpers
 
 
     }
-  
+
+    /*
+     return $"🟢 Signal 🟢\n" +
+                   $"Coin: {sp.Symbol}\n" +
+                   $"prix: {PriceUtility.turnicateNumber(sp.entryPrice)}\n" +
+                   $"🎯 Tp1 (1%): {PriceUtility.turnicateNumber(sp.target1)}\n" +
+                   $"🎯 Tp2 (2%): {PriceUtility.turnicateNumber(sp.target2)}\n" +
+                   $"🔻 SP : {PriceUtility.turnicateNumber(sp.stopLoss)}" +
+                   $"🔻 temp : {sp.timeStamp}";
+     */
 
     public static class MessageUtility
     {
@@ -117,16 +157,35 @@ namespace TradingBot.Helpers
         {
             return $"🟢 Signal 🟢\n" +
                    $"Coin: {sp.Symbol}\n" +
-                   $"prix: {PriceUtility.turnicateNumber(sp.entryPrice)}\n" +
-                   $"🎯 Tp1 (1%): {PriceUtility.turnicateNumber(sp.target1)}\n" +
-                   $"🎯 Tp2 (2%): {PriceUtility.turnicateNumber(sp.target2)}\n" +
-                   $"🔻 SP : {PriceUtility.turnicateNumber(sp.stopLoss)}" +
-                   $"🔻 temp : {PriceUtility.turnicateNumber(sp.timeStamp)}";
+                   $"prix: {sp.entryPrice}\n" +
+                   $"🎯 Tp1 (1%): {sp.target1}\n" +
+                   $"🎯 Tp2 (2%): {sp.target2}\n" +
+                   $"🔻 SP : {sp.stopLoss}" +
+                   $"🔻 temp : {sp.timeStamp}";
 
         }
         public static string FromatReplySpot(int index,SpotModel spotModel,TimeSpan duration)
         {
             switch(index)
+            {
+                case 1:
+                    return $"{spotModel.Symbol} Tp1 ✅ :  {spotModel.target1}, duration:{duration.TotalMinutes} ";
+                case 2:
+                    return $"{spotModel.Symbol} Tp2 ✅ :  {spotModel.target2}, duration:{duration.TotalMinutes} ";
+                case 3:
+                    return $"{spotModel.Symbol} stopLoss ❌:  {spotModel.stopLoss} , duration:{duration.TotalMinutes}";
+                case 0:
+                    return null;
+                default:
+                    return null;
+
+
+            }
+            
+        }
+    }
+    /*
+      switch(index)
             {
                 case 1:
                     return $"{spotModel.Symbol} Tp1 ✅ :  {PriceUtility.turnicateNumber(spotModel.target1)}, duration:{duration.TotalMinutes} ";
@@ -141,11 +200,9 @@ namespace TradingBot.Helpers
 
 
             }
-            
-        }
-    }
+     
+     */
 
-  
     public static class PriceUtility
     {
         public static bool HasPriceChanged(decimal currentPrice, decimal lastCoinPrice)
@@ -184,18 +241,5 @@ namespace TradingBot.Helpers
     }
 
 
-    //public static class SecurityUtility
-    //{
-    //    public  static string GenerateSignature(string queryString, string apiSecret)
-    //    {
-    //        byte[] keyBytes = Encoding.UTF8.GetBytes(apiSecret);
-    //        byte[] messageBytes = Encoding.UTF8.GetBytes(queryString);
 
-    //        using (var hmac = new HMACSHA256(keyBytes))
-    //        {
-    //            byte[] hashBytes = hmac.ComputeHash(messageBytes);
-    //            return BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
-    //        }
-    //    }
-    //}
 }

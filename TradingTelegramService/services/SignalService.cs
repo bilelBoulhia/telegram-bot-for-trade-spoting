@@ -11,7 +11,7 @@ namespace TradingTelegramService.services
     private readonly BotRepo _botservices;
     private readonly SpotingRepo _spotingRepo;
     private List<string> coins = ClassUtil.GetDataFromClass();
-    private Dictionary<string, List<List<object>>> _cachedCoinData = new(); 
+
 
     public SignalService(BotRepo botServices, SpotingRepo spotingRepo)
     {
@@ -25,31 +25,12 @@ namespace TradingTelegramService.services
 
         foreach (var c in coins)
         {
-          
-            if (_cachedCoinData.TryGetValue(c, out var oldData))
-            {
-                var newData = await _spotingRepo.FetchCandleStickData(c);
-
-               
-                if (newData.Count > 0 && oldData.Count > 0 )
-                {
-                 
-                    continue; 
-                }
-
-                _cachedCoinData[c] = newData; 
-                coindata.Add(new coinData { data = newData, symbol = c });
-            }
-            else
-            {
-                
-                var newData = await _spotingRepo.FetchCandleStickData(c);
-                _cachedCoinData[c] = newData;
-
-                coindata.Add(new coinData { data = newData, symbol = c });
-
+          var newData = await _spotingRepo.FetchCandleStickData(c);
+          Console.WriteLine($"This new data from candle stick be added {newData.Count} of symbole {c}");
+          coindata.Add(new coinData { data = newData, symbol = c });
+                    
         
-            }
+            
         }
 
         return coindata;
@@ -72,6 +53,7 @@ namespace TradingTelegramService.services
                 };
                 if (StockUtil.PerformTechnicalAnalasys(qr))
                 {
+                    Console.WriteLine($"this coind is ready to be signale : {coin.symbol} with a example result {qr.atrResult}");
                     coinsReadyTobeSignaled.Add(coin.symbol);
                 }
 
@@ -86,6 +68,7 @@ namespace TradingTelegramService.services
             List<MoniteredCoinsModel> monitoredCoins = new();
             foreach (var coin in SelectedCoins)
             {
+                Console.WriteLine($"this coin {coin}will have its spot fetched ");
                 monitoredCoins.Add(new MoniteredCoinsModel()
                 {
                     coinSP = await _spotingRepo.FetchSpotings(coin),
@@ -97,21 +80,29 @@ namespace TradingTelegramService.services
 
         }
 
-        public async Task SendSelectedCoins(List<MoniteredCoinsModel> SelectedCoins)
+        public async Task SendSelectedCoins(List<MoniteredCoinsModel> MoniteredCoins, List<MoniteredCoinsModel> NewMoniteredCoinsSpots)
         {
-           
-          foreach(var coin in SelectedCoins)
+
+            foreach (var coin in MoniteredCoins)
             {
-                if(coin.attachedMessage == null)
+                var newspotPrice = NewMoniteredCoinsSpots.Where(newc => coin.coinSP.Symbol == newc.coinSP.Symbol).Select(s => s.coinSP.entryPrice).FirstOrDefault();
+
+                if (coin.attachedMessage == null || PriceUtility.HasPriceChanged(coin.coinSP.entryPrice,newspotPrice))
                 {
                     var spotMessage = MessageUtility.FormatSpotTradeSignal(coin.coinSP);
                     coin.attachedMessage = await _botservices.SendMessage(coin.coinSP, spotMessage);
+                    Console.WriteLine($"this coin {coin}will sent by telegram with this message {spotMessage}");
                 }
                 else
                 {
                     var duration = DateTime.UtcNow - coin.coinSP.timeStamp;
+                 
                     string reply = MessageUtility.FromatReplySpot(PriceUtility.CheckUpdatedPrice(coin.coinSP), coin.coinSP, duration);
-                    await _botservices.ReplyToMessage(coin.attachedMessage, reply);
+                    if(reply != null)
+                    {
+                        await _botservices.ReplyToMessage(coin.attachedMessage, reply);
+                    }
+                  
 
                 }
                
