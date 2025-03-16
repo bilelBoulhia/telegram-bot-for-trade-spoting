@@ -19,10 +19,21 @@ namespace TradingTelegramService.Worker
         {
             _logger.LogInformation("Starting background worker...");
 
-            var mainTask = Task.Run(() => RunFetchingTask(stoppingToken), stoppingToken);
-            var secondaryTask = Task.Run(() => RunSendingTask(stoppingToken), stoppingToken);
+            while (!stoppingToken.IsCancellationRequested)
+            {
+                try
+                {
+                    var mainTask = Task.Run(() => RunFetchingTask(stoppingToken), stoppingToken);
+                    var secondaryTask = Task.Run(() => RunSendingTask(stoppingToken), stoppingToken);
 
-            await Task.WhenAll(mainTask, secondaryTask);
+                    await Task.WhenAll(mainTask, secondaryTask);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Unhandled exception in worker. Restarting in 10 seconds...");
+                    await Task.Delay(TimeSpan.FromSeconds(1), stoppingToken);
+                }
+            }
         }
 
         private async Task RunFetchingTask(CancellationToken stoppingToken)
@@ -34,49 +45,50 @@ namespace TradingTelegramService.Worker
                     var coindata = await _spotTradingService.fetchCoinData();
                     var treatedCoins = _spotTradingService.performAnalays(coindata);
 
+                    _logger.LogInformation($"the coins that are treated are of length : {treatedCoins.Count}");
+
                     if (treatedCoins.Count == 0)
                     {
                         _logger.LogInformation("No coins have enough liquidity.");
-                        await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken); 
-                        continue; 
+                        await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
+                        continue;
                     }
-
-                    if (moniteredCoins != null)
-                    {
-                        moniteredCoins.Clear();
-                    }
-
+                    _logger.LogInformation($"the MONITORED COINS ARE BEFORE BEING CLREAD : {moniteredCoins?.Count}");
+                    moniteredCoins?.Clear();
                     moniteredCoins = await _spotTradingService.FetchSpotOfSelectedCoins(treatedCoins);
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Error in main task");
+                    _logger.LogError(ex, "Error in fetching task");
                 }
 
-                await Task.Delay(TimeSpan.FromHours(2), stoppingToken); 
+                await Task.Delay(TimeSpan.FromHours(1), stoppingToken);
             }
         }
 
-
         private async Task RunSendingTask(CancellationToken stoppingToken)
         {
-
             while (moniteredCoins == null && !stoppingToken.IsCancellationRequested)
             {
-
-                await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
+                await Task.Delay(TimeSpan.FromMinutes(2), stoppingToken);
             }
 
             while (!stoppingToken.IsCancellationRequested)
             {
-
                 try
                 {
                     if (moniteredCoins.Count > 0)
                     {
-                       var newCoinSpots =   await _spotTradingService.FetchSpotOfSelectedCoins(moniteredCoins.Select(c=>c.coinSP.Symbol).ToList());
-
-                       await _spotTradingService.SendSelectedCoins(moniteredCoins,newCoinSpots);
+                        var newCoinSpots = await _spotTradingService.FetchSpotOfSelectedCoins(moniteredCoins.Select(c => c.coinSP.Symbol).ToList());
+                        foreach (var item in newCoinSpots)
+                        {
+                            _logger.LogInformation($"New COINS TO BE SPOTTED ARE . {item.coinSP.Symbol}");
+                        }
+                        foreach (var item in newCoinSpots)
+                        {
+                            _logger.LogInformation($"monitored COINS TO BE SPOTTED ARE . {item.coinSP.Symbol}");
+                        }
+                        await _spotTradingService.SendSelectedCoins(moniteredCoins, newCoinSpots);
                     }
                     else
                     {
@@ -87,10 +99,9 @@ namespace TradingTelegramService.Worker
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Error in parallel task");
+                    _logger.LogError(ex, "Error in sending task");
                 }
             }
         }
-
     }
 }

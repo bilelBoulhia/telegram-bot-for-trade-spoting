@@ -8,12 +8,13 @@ namespace TradingTelegramService.services
 {
     public class SignalService
 {
-    private readonly BotRepo _botservices;
-    private readonly SpotingRepo _spotingRepo;
-    private List<string> coins = ClassUtil.GetDataFromClass();
+        private readonly BotRepo _botservices;
+        private readonly SpotingRepo _spotingRepo;
+        private List<string> coins = ClassUtil.GetDataFromClass();
+        public List<MoniteredCoinsModel> MonitoredCoins { get; private set; } = new();
 
 
-    public SignalService(BotRepo botServices, SpotingRepo spotingRepo)
+        public SignalService(BotRepo botServices, SpotingRepo spotingRepo)
     {
         _botservices = botServices;
         _spotingRepo = spotingRepo;
@@ -26,6 +27,7 @@ namespace TradingTelegramService.services
         foreach (var c in coins)
         {
           var newData = await _spotingRepo.FetchCandleStickData(c);
+                Console.WriteLine($"fetching data of {c}");
 
           coindata.Add(new coinData { data = newData, symbol = c });
                     
@@ -66,6 +68,7 @@ namespace TradingTelegramService.services
         public async Task<List<MoniteredCoinsModel>> FetchSpotOfSelectedCoins(List<string> SelectedCoins)
         {
             List<MoniteredCoinsModel> monitoredCoins = new();
+            Console.WriteLine($"fetching coins spot of {monitoredCoins.Count} coins");
             foreach (var coin in SelectedCoins)
             {
             
@@ -91,7 +94,7 @@ namespace TradingTelegramService.services
                 {
                     var spotMessage = MessageUtility.FormatSpotTradeSignal(coin.coinSP);
                     coin.attachedMessage = await _botservices.SendMessage(coin.coinSP, spotMessage);
-                    Console.WriteLine($"this coin {coin}will sent by telegram with this message {spotMessage}");
+                    Console.WriteLine($"this coin {coin} will sent by telegram with this message {spotMessage}");
                 }
                 else
                 {
@@ -108,6 +111,12 @@ namespace TradingTelegramService.services
                
             }
 
+        }
+
+
+        public void UpdateMonitoredCoins(List<MoniteredCoinsModel> newCoins)
+        {
+            MonitoredCoins = newCoins;
         }
 
     }

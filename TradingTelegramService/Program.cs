@@ -12,9 +12,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 
 builder.Services.AddControllers();
+builder.Services.AddHealthChecks();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddHostedService<SpotTradingNotificationWorker>();
+//builder.Services.AddHostedService<SpotTradingNotificationWorker>();
 builder.Services.AddSingleton<Market>();
 builder.Services.AddSingleton<SignalService>();
 builder.Services.AddSingleton<BotRepo>();
@@ -42,11 +43,22 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-    //app.UseSwagger();
-    //app.UseSwaggerUI();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
+
+//builder.Services.AddCors(options =>
+//{
+//    options.AddPolicy("AllowAll", policy =>
+//    {
+//        policy.AllowAnyOrigin()
+//              .AllowAnyMethod()
+//              .AllowAnyHeader();
+//    });
+//});
+
 
 app.UseAuthorization();
 
